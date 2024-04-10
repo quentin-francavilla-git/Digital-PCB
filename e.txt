@@ -1,0 +1,87 @@
+from flask import Flask, request, render_template_string
+import win32com.client
+import pythoncom
+
+app = Flask(__name__)
+
+HTML_FORM = '''
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CATIA Parameters Input</title>
+</head>
+<body>
+    <h2>Enter Parameters for CATIA</h2>
+    <form method="POST">
+        X: <input type="text" name="x" /><br />
+        Y: <input type="text" name="y" /><br />
+        <input type="submit" />
+    </form>
+</body>
+</html>
+'''
+
+@app.route('/', methods=['GET', 'POST'])
+
+def catia_parameters():
+    if request.method == 'POST':
+        x = request.form['x']
+        y = request.form['y']
+        create_catia_part(x, y)
+        return 'Parameters sent to CATIA: x={}, y={}'.format(x, y)
+    return render_template_string(HTML_FORM)
+
+def create_catia_part(x, y):
+
+    pythoncom.CoInitialize()  # Needed if running in a thread or web application
+
+    # Ensure X and Y are converted to float for CATIA operations
+    x = float(x)
+    y = float(y)
+
+    try:
+        # Connect to CATIA
+        catia = win32com.client.Dispatch("CATIA.Application")
+    except Exception as e:
+        print(f"Error connecting to CATIA: {e}")
+        return
+
+    # Create a new part document
+    documents = catia.Documents
+    partDoc = documents.Add("Part")
+    part = partDoc.Part
+    bodies = part.Bodies
+    body = bodies.Item(1)
+    sketches = body.Sketches
+
+    # Create a sketch on the xy plane
+    xyPlane = part.OriginElements.PlaneXY
+    sketch = sketches.Add(xyPlane)
+
+    # Open sketch for drawing
+    factory2D = sketch.OpenEdition()
+
+    # Drawing a rectangle based on x and y parameters
+    point1 = factory2D.CreatePoint(0, 0)
+    point2 = factory2D.CreatePoint(x, 0)
+    point3 = factory2D.CreatePoint(x, y)
+    point4 = factory2D.CreatePoint(0, y)
+    line1 = factory2D.CreateLine(0, 0, x, 0)
+    line2 = factory2D.CreateLine(x, 0, x, y)
+    line3 = factory2D.CreateLine(x, y, 0, y)
+    line4 = factory2D.CreateLine(0, y, 0, 0)
+
+    # Close the sketch edition
+    sketch.CloseEdition()
+
+    # Extrude the sketch
+    shapeFactory = part.ShapeFactory
+    pad = shapeFactory.AddNewPad(sketch, 20)  # Extrusion length
+
+    # Update the part to apply changes
+    part.Update()
+
+    print(f"Creating part with x={x} and y={y}")
+
+if __name__ == '__main__':
+    app.run(debug=True)

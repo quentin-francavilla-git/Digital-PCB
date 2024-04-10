@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link
+            rel="stylesheet"
+            href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        />
+        <title>CATIA Parameters Input</title>
+    </head>
+    <body>
+        <div class="container mt-5">
+            <!-- TITLE -->
+            <div class="row">
+                <div class="col-md-6 offset-md-3">
+                    <h2 class="mb-4">Enter Parameters for CATIA</h2>
+                </div>
+            </div>
+
+            <!-- INPUTS -->
+            <div class="row">
+                <div class="col-md-4 offset-md-3">
+                    <form method="POST" class="needs-validation" novalidate>
+                        <div class="row">
+                            <!-- A Input on the left -->
+                            <div class="col-md-4 form-group">
+                                <label for="aInput">A</label>
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="aInput"
+                                    name="a"
+                                    value="10.0"
+                                    required
+                                />
+                            </div>
+                            <!-- B Input on the left -->
+                            <div class="col-md-4 form-group">
+                                <label for="bInput">B</label>
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="bInput"
+                                    name="b"
+                                    value="10.0"
+                                    required
+                                />
+                            </div>
+                            <!-- C Input on the right -->
+                            <div class="col-md-4 form-group">
+                                <label for="cInput">C</label>
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="cInput"
+                                    name="c"
+                                    value="10.0"
+                                    required
+                                />
+                            </div>
+
+                            <!-- D Input on the left -->
+                            <div class="col-md-4 form-group">
+                                <label for="dInput">D</label>
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="dInput"
+                                    name="d"
+                                    value="20.0"
+                                    required
+                                />
+                            </div>
+                        </div>
+                        <!-- PERCAGE -->
+                        <div class="form-group">
+                            <h5>Perçage PCB</h5>
+                            <div class="custom-control custom-radio">
+                                <input
+                                    type="radio"
+                                    id="choiceYes"
+                                    name="choicePercage"
+                                    class="custom-control-input"
+                                    value="Yes"
+                                    checked
+                                />
+                                <label
+                                    class="custom-control-label"
+                                    for="choiceYes"
+                                    >Oui</label
+                                >
+                            </div>
+                            <div class="custom-control custom-radio">
+                                <input
+                                    type="radio"
+                                    id="choiceNo"
+                                    name="choicePercage"
+                                    class="custom-control-input"
+                                    value="No"
+                                />
+                                <label
+                                    class="custom-control-label"
+                                    for="choiceNo"
+                                    >Non</label
+                                >
+                            </div>
+                        </div>
+
+                        <div id="imageContainer"></div>
+
+                        <!-- SUBMIT -->
+                        <button type="submit" class="my-5 btn btn-primary">
+                            Submit
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function updateImage() {
+                // Find which radio button is checked by iterating over them
+                let selectedValue = document.querySelector(
+                    'input[name="choicePercage"]:checked'
+                ).value;
+
+                const imageContainer =
+                    document.getElementById('imageContainer');
+
+                // Update the image based on the selected value
+                if (selectedValue === 'Yes') {
+                    imageContainer.innerHTML =
+                        '<img src="/static/img/img1.png" alt="Yes" width="400">';
+                } else {
+                    imageContainer.innerHTML =
+                        '<img src="/static/img/img2.png" alt="No" width="400">';
+                }
+            }
+
+            // Listen for changes on radio buttons
+            document
+                .querySelectorAll('input[name="choicePercage"]')
+                .forEach((elem) => {
+                    elem.addEventListener('change', updateImage);
+                });
+
+            // Call updateImage on page load to display the correct initial image
+            document.addEventListener('DOMContentLoaded', updateImage);
+        </script>
+    </body>
+</html>
